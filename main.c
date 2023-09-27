@@ -16,6 +16,7 @@ typedef struct {
 	SDL_Surface* image;
 	SDL_Texture* texture;
 	int x, y, w, h;
+	bool dead;
 } ChessPiece;
 
 typedef struct {
@@ -67,53 +68,56 @@ void draw_board(SDL_Renderer* r, WhiteBoard* white_board, BlackBoard* black_boar
 			SDL_RenderFillRect(r, &rect);
 		}
 	}
+}
+
+void draw_white_pieces(SDL_Renderer* renderer, WhiteBoard* white_board){
 	for(int i = 0; i < 8; i++){
 		SDL_Rect rect = { white_board->pawns[i].x, white_board->pawns[i].y, PIECE_WIDTH, PIECE_HEIGHT };
-		SDL_RenderCopy(r, white_board->pawns[i].texture, NULL, &rect);
-	}
-
-	for(int i = 0; i < 8; i++){
-		SDL_Rect rect = { black_board->pawns[i].x, black_board->pawns[i].y, PIECE_WIDTH, PIECE_HEIGHT };
-		SDL_RenderCopy(r, black_board->pawns[i].texture, NULL, &rect);
+		SDL_RenderCopy(renderer, white_board->pawns[i].texture, NULL, &rect);
 	}
 
 	for (int i = 0; i < 2; i++) {
 		SDL_Rect rect = { white_board->rook[i].x, white_board->rook[i].y, PIECE_WIDTH, PIECE_HEIGHT };
-		SDL_RenderCopy(r, white_board->rook[i].texture, NULL, &rect);
-	}
-
-	for (int i = 0; i < 2; i++) {
-		SDL_Rect rect = { black_board->rook[i].x, black_board->rook[i].y, PIECE_WIDTH, PIECE_HEIGHT };
-		SDL_RenderCopy(r, black_board->rook[i].texture, NULL, &rect);
+		SDL_RenderCopy(renderer, white_board->rook[i].texture, NULL, &rect);
 	}
 
 	for (int i = 0; i < 2; i++) {
 		SDL_Rect rect = { white_board->bishop[i].x, white_board->bishop[i].y, PIECE_WIDTH, PIECE_HEIGHT };
-		SDL_RenderCopy(r, white_board->bishop[i].texture, NULL, &rect);
+		SDL_RenderCopy(renderer, white_board->bishop[i].texture, NULL, &rect);
+	}
+
+	for (int i = 0; i < 2; i++) {
+		SDL_Rect rect = { white_board->knight[i].x, white_board->knight[i].y, PIECE_WIDTH, PIECE_HEIGHT };
+		SDL_RenderCopy(renderer, white_board->knight[i].texture, NULL, &rect);
+	}
+
+	SDL_Rect rect = { white_board->queen.x, white_board->queen.y, PIECE_WIDTH, PIECE_HEIGHT };
+	SDL_RenderCopy(renderer, white_board->queen.texture, NULL, &rect);
+}
+
+void draw_black_pieces(SDL_Renderer* renderer, BlackBoard* black_board) {
+	for(int i = 0; i < 8; i++){
+		SDL_Rect rect = { black_board->pawns[i].x, black_board->pawns[i].y, PIECE_WIDTH, PIECE_HEIGHT };
+		SDL_RenderCopy(renderer, black_board->pawns[i].texture, NULL, &rect);
+	}
+
+	for (int i = 0; i < 2; i++) {
+		SDL_Rect rect = { black_board->rook[i].x, black_board->rook[i].y, PIECE_WIDTH, PIECE_HEIGHT };
+		SDL_RenderCopy(renderer, black_board->rook[i].texture, NULL, &rect);
 	}
 
 	for (int i = 0; i < 2; i++) {
 		SDL_Rect rect = { black_board->bishop[i].x, black_board->bishop[i].y, PIECE_WIDTH, PIECE_HEIGHT };
-		SDL_RenderCopy(r, black_board->bishop[i].texture, NULL, &rect);
-	}
-	
-	for (int i = 0; i < 2; i++) {
-		SDL_Rect rect = { white_board->knight[i].x, white_board->knight[i].y, PIECE_WIDTH, PIECE_HEIGHT };
-		SDL_RenderCopy(r, white_board->knight[i].texture, NULL, &rect);
+		SDL_RenderCopy(renderer, black_board->bishop[i].texture, NULL, &rect);
 	}
 
 	for (int i = 0; i < 2; i++) {
 		SDL_Rect rect = { black_board->knight[i].x, black_board->knight[i].y, PIECE_WIDTH, PIECE_HEIGHT };
-		SDL_RenderCopy(r, black_board->knight[i].texture, NULL, &rect);
+		SDL_RenderCopy(renderer, black_board->knight[i].texture, NULL, &rect);
 	}
-
-	SDL_Rect rect = { white_board->queen.x, white_board->queen.y, PIECE_WIDTH, PIECE_HEIGHT };
-	SDL_RenderCopy(r, white_board->queen.texture, NULL, &rect);
 	
 	SDL_Rect rect2 = { black_board->queen.x, black_board->queen.y, PIECE_WIDTH, PIECE_HEIGHT };
-	SDL_RenderCopy(r, black_board->queen.texture, NULL, &rect2);
-
-	SDL_RenderPresent(r);
+	SDL_RenderCopy(renderer, black_board->queen.texture, NULL, &rect2);
 }
 
 void init_pieces_image(SDL_Renderer* renderer, WhiteBoard* white_board, BlackBoard* black_board) {
@@ -251,6 +255,9 @@ int main(void) {
 	SDL_Event event;
 	while(!quit) {
 		draw_board(renderer, &white_board, &black_board);
+		draw_white_pieces(renderer, &white_board);
+		draw_black_pieces(renderer, &black_board);
+		SDL_RenderPresent(renderer);
 		while(SDL_PollEvent(&event)) {
 			switch(event.type) {
 				case SDL_KEYDOWN:
